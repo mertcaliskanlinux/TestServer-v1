@@ -1,0 +1,10 @@
+<h2>Login</h2>
+
+<form method="POST">
+    {% csrf_token %}
+    {{ form.as_p }}
+    <input type="submit" value="Login">
+</form>
+<a href="{% url 'users:register_user' %}">Kayıt Ol</a>
+
+<a href="{% url 'todo:todo_list' %}">Back to dashboard</a>

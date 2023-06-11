@@ -1,0 +1,58 @@
+<!DOCTYPE html>
+<html>
+<head>
+    <title>Update ToDo Item</title>
+    <link rel="stylesheet" href="//code.jquery.com/ui/1.12.1/themes/base/jquery-ui.css">
+    <link rel="stylesheet" type="text/css" href="style.css">
+    <script src="https://code.jquery.com/jquery-1.12.4.js"></script>
+    <script src="https://code.jquery.com/ui/1.12.1/jquery-ui.js"></script>
+    <script>
+        $( function() {
+            $( "#created_at" ).datepicker({
+                dateFormat: 'yy-mm-dd',
+                changeMonth: true,
+                changeYear: true
+            });
+        } );
+    </script>
+</head>
+<body>
+    <h1>Update ToDo Item</h1>
+    <form method="post" action="{% url 'todo:todo_update' slug=todo.slug id=todo.pk %}">
+        {% csrf_token %}
+    
+        <div class="form-group">
+            <label for="id_title">Title:</label>
+            <input type="text" id="id_title" name="title" value="{{ form.initial.title }}">
+        </div>
+    
+        <div class="form-group">
+            <label for="id_completed">Completed:</label>
+            <input type="checkbox" id="id_completed" name="completed" {% if form.initial.completed %}checked{% endif %}>
+        </div>
+        
+        <div class="form-group">
+            <label for="id_is_archived">Is Archived:</label>
+            <input type="checkbox" id="id_is_archived" name="is_archived" {% if form.initial.is_archived %}checked{% endif %}>
+        </div>
+        
+        <div class="form-group">
+            <label for="id_created_at">Created At:</label>
+            <input type="text" id="id_created_at" name="created_at" value="{{ todo.created_at|date:'Y-m-d' }}" readonly>
+        </div>
+    
+        <div class="form-group">
+            <label for="id_updated_at">Updated At:</label>
+            <input type="text" id="id_updated_at" name="updated_at" value="{{ todo.updated_at|date:'Y-m-d' }}" readonly>
+        </div>
+    
+        <div class="button-group">
+            <button type="submit" class="btn btn-primary">Güncelle</button>
+            <a href="{% url 'todo:todo_detail' slug=todo.slug pk=todo.pk %}" class="btn btn-secondary">Detail</a>
+            <button class="btn btn-danger"><a href="{% url 'todo:todo_delete' slug=todo.slug pk=todo.pk %}">Sil</a></button>
+            <button class="btn btn-primary"><a href="{% url 'todo:todo_list' %}">List</a></button>
+        </div>
+    </form>
+    
+</body>
+</html>

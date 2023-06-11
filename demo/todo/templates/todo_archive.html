@@ -1,0 +1,22 @@
+<!DOCTYPE html>
+<html>
+<head>
+    <title>ToDo Archive</title>
+</head>
+<body>
+    <h1>ToDo Archive</h1>
+    <h2>{{ todo.id }}</h2>
+    <h2>{{ todo.title }}</h2>
+    <p>Completed: {{ todo.completed }}</p>
+    <p>Created At: {{ todo.created_at }}</p>
+    <p>Updated At: {{ todo.updated_at }}</p>
+    <p><a href="/">index</a></p>
+    {% if is_archived %}
+        <p>Archived: Yes</p>
+        <a href="{% url 'todo:todo_unarchive' slug=todo.slug pk=todo.pk %}">Unarchive</a>
+    {% else %}
+        <p>Archived: No</p>
+        <a href="{% url 'todo:todo_archive' slug=todo.slug pk=todo.pk %}">Archive</a>
+    {% endif %}
+</body>
+</html>

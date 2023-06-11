@@ -1,0 +1,40 @@
+<!DOCTYPE html>
+<html>
+<head>
+    <title>ToDo Detail</title>
+</head>
+<body>
+    <h1>ToDo Detail</h1>
+    <h2>id: {{ todo.id }}</h2>
+    <h2>title: {{ todo.title }}</h2>
+    <h2>Tamamlama: {{ todo.completed }}</h2>
+    <h2>Slug: {{ todo.slug }}</h2>
+    <h2>Created: {{ todo.created_at }}</h2>
+    <h2>Update: {{ todo.updated_at }}</h2>
+    <h2>Arşiv Durumu: {{ todo.is_archived }}</h2>
+
+    <form method="post" action="{% url 'todo:todo_update' slug=todo.slug id=todo.pk %}">
+        {% csrf_token %}
+        {{ form.as_p }}
+        <button type="submit" onclick="setActionUrl()">Güncelle</button>
+        <button type="submit"><a href="{% url 'todo:todo_detail' slug=todo.slug pk=todo.pk %}">Detail</a></button>
+        <button><a href="{% url 'todo:todo_delete' slug=todo.slug pk=todo.pk %}">Sil</a></button>
+        <button><a href="{% url 'todo:todo_list' %}">List</a></button>
+
+
+    </form>
+
+
+    <script>
+        function setActionUrl() {
+            var form = document.querySelector('form');
+            var actionUrl = form.getAttribute('action');
+            var slug = "{{ todo.slug }}";
+            var id = "{{ todo.pk }}";
+            var updatedActionUrl = actionUrl.replace('slug', slug).replace('id', id);
+            form.setAttribute('action', updatedActionUrl);
+        }
+    </script>
+
+</body>
+</html>

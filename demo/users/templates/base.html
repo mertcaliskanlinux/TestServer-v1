@@ -1,0 +1,34 @@
+
+<style>
+    label, input {
+        display: block;
+    }
+    span.helptext {
+        display: none;
+    }
+</style>
+
+
+<h1>Welcome to Awesome Website</h1>
+
+
+{% block content %}
+<h2>Login</h2>
+
+<form method="POST">
+    {% csrf_token %}
+    {{ form.as_p }}
+    <input type="submit" value="Login">
+</form>
+
+<a href="{% url 'todo:todo_list' %}">Back to dashboard</a>
+{% endblock %}
+
+
+{% if user.is_authenticated %}
+    <p>Merhaba, {{ user.username }}!</p>
+    <a href="{% url 'users:logout' %}">Çıkış Yap</a>
+{% else %}
+    <a href="{% url 'users:login' %}">Giriş Yap</a> |
+    <a href="{% url 'users:register_user' %}">Kayıt Ol</a>
+{% endif %}
