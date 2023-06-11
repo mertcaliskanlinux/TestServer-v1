@@ -11,31 +11,27 @@ from django.template import loader
 
 # Counter metriği oluşturma
 todo_request_total = Counter('todo_requests_total', 'Total number of todo requests')
-todo_request_created = Counter('todo_create_requests', 'Total number of todo requests created')
-todo_request_update= Counter('todo_update_requests', 'Total number of todo requests update')
-todo_request_delete = Counter('todo_delete_requests', 'Total number of todo requests delete')
+todo_request_create = Counter('todo_create_requests_total', 'Total number of todo requests created')
+todo_request_update= Counter('todo_update_requests_total', 'Total number of todo requests update')
+todo_request_delete = Counter('todo_delete_requests_total', 'Total number of todo requests delete')
+todo_request_detail = Counter('todo_detail_requests_total', 'Total number of todo requests detail')
 
 
 
 class TodoList(ListView):
+    
     model = TodoItem
     template_name = 'todo_list.html'
     context_object_name = 'todos'
 
     def get(self, request, *args, **kwargs):
         todo_request_total.inc()
-
-        # Loading the template
-        template = loader.get_template(self.template_name)
-
-        # Retrieving the list of objects
-        self.object_list = self.get_queryset()
-
-        # Rendering the template with the given context
-        context = self.get_context_data()
-        rendered_template = template.render(context, request)
-
-        return HttpResponse(rendered_template)
+        return super().get(request, *args, **kwargs)
+    
+    
+    def post(self, request, *args, **kwargs):
+        todo_request_total.inc()
+        return super().post(request, *args, **kwargs)
 
 
 class TodoCreate(CreateView):  # CreateView sınıfından TodoCreate adında bir sınıf oluşturuyoruz
@@ -56,30 +52,23 @@ class TodoCreate(CreateView):  # CreateView sınıfından TodoCreate adında bir
         form.instance.slug = slug # formun slug alanına slug değerini atıyoruz  
         return super().form_valid(form) # formu doğruluyoruz
     
-
     def get(self, request, *args, **kwargs):
-        todo_request_created.inc()
+        todo_request_create.inc()
+        return super().get(request, *args, **kwargs)
 
-        # Loading the template
-        template = loader.get_template(self.template_name)
-
-        # Retrieving the list of objects
-        self.object_list = self.get_queryset()
-
-        # Rendering the template with the given context
-        context = self.get_context_data()
-        rendered_template = template.render(context, request)
-
-        return HttpResponse(rendered_template)
+    def post(self, request, *args, **kwargs):
+        todo_request_create.inc()
+        return super().post(request, *args, **kwargs)
 
 
 class TodoUpdate(UpdateView):
-    model = TodoItem # model.py deki TodoItem modelini kullanıyoruz
-    template_name = 'todo_update.html'  # template dosyamızı belirtiyoruz
-    fields = ['title', 'completed', 'is_archived'] # formda göstermek istediğimiz alanları belirtiyoruz
-    context_object_name = 'todo'    # template dosyamızda kullanacağımız context adını belirtiyoruz
-    slug_url_kwarg = 'slug' # urldeki slug alanının adını belirtiyoruz 
-    pk_url_kwarg = 'id' # urldeki id alanının adını belirtiyoruz 
+    model = TodoItem
+    template_name = 'todo_update.html'
+    fields = ['title', 'completed', 'is_archived']
+    context_object_name = 'todo'
+    slug_url_kwarg = 'slug'
+    pk_url_kwarg = 'id'
+
 
     def get_object(self, queryset=None): 
         slug = self.kwargs.get('slug') # urldeki slug alanını alıyoruz
@@ -102,22 +91,16 @@ class TodoUpdate(UpdateView):
         initial['completed'] = todo.completed # formun completed alanına todo.completed değerini atıyoruz
         initial['is_archived'] = todo.is_archived # formun is_archived alanına todo.is_archived değerini atıyoruz
         return initial
-
+    
     def get(self, request, *args, **kwargs):
-            todo_request_update.inc() # todo_request_update metriğini 1 arttırıyoruz örneğin: todo_request_update: 1 -> 2
+        todo_request_update.inc()
+        return super().get(request, *args, **kwargs)
 
+    def post(self, request, *args, **kwargs):
+        todo_request_update.inc()
+        return super().post(request, *args, **kwargs)
 
-            # Loading the template
-            template = loader.get_template(self.template_name) # template dosyamızı belirtiyoruz
-
-            # Retrieving the list of objects
-            self.object_list = self.get_queryset() 
-
-            # Rendering the template with the given context
-            context = self.get_context_data() # 
-            rendered_template = template.render(context, request)
-
-            return HttpResponse(rendered_template)
+  
 
 
 
@@ -133,9 +116,15 @@ class TodoDetail(DetailView):
         form_data = request.POST
         
         return redirect('todo:todo_update', slug=self.object.slug, pk=self.object.pk)
-    
-    
 
+    def get(self, request, *args, **kwargs):
+        todo_request_detail.inc()
+        return super().get(request, *args, **kwargs)
+
+    def post(self, request, *args, **kwargs):
+        todo_request_detail.inc()
+        return super().post(request, *args, **kwargs)
+     
 
 class TodoDelete(DeleteView):
     model = TodoItem
@@ -162,10 +151,17 @@ class TodoDelete(DeleteView):
         self.object = self.get_object()
         self.object.delete()
         return redirect(self.success_url)
-
     
     
+    def get(self, request, *args, **kwargs):
+            todo_request_delete.inc()
+            return super().get(request, *args, **kwargs)
 
+    def post(self, request, *args, **kwargs):
+        todo_request_delete.inc()
+        return super().post(request, *args, **kwargs)
+
+    
 class TodoSearch(View):
     def get(self, request):
         query = request.GET.get('q')

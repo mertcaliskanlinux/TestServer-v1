@@ -48,11 +48,25 @@ services:
       - '--config.file=/etc/prometheus/prometheus.yml'
       
     restart: always
-    
+
     ports:
       - "9090:9090"
     networks:
       - nginx_network
+
+  grafana:
+
+    image: grafana/grafana-enterprise
+    
+    container_name: grafana
+
+    restart: unless-stopped
+    ports:
+     - '3000:3000'
+    networks:
+      - nginx_network
+    volumes:
+      - grafana_data:/var/lib/grafana
 
 networks:
   nginx_network:
@@ -62,3 +76,4 @@ volumes:
   static_volume:
   media_volume:
   postgres_data:  # Declare the postgres_data volume
+  grafana_data: {}
